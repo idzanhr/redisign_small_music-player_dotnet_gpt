@@ -1,0 +1,16 @@
+<!-- Music Room. Copyright (C) 2026 Marko Idžan. Licensed under GPL-3.0-or-later. Modified November 3, 2026. -->
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>MusicRoom</AssemblyName>
+    <RootNamespace>MusicRoom</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Update="LICENSE" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>
+
