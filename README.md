@@ -12,13 +12,18 @@ Install the .NET 8 SDK, open this folder in a terminal, and run:
 dotnet run
 ```
 
-To build a standalone Windows 11 executable:
+To build a standalone Windows 11 executable and ZIP package:
 
 ```powershell
-dotnet publish -c Release -r win-x64 --self-contained true
+dotnet publish MusicRoom.csproj -c Release -r win-x64 --self-contained true -o publish -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
+Compress-Archive -Path "publish\*" -DestinationPath "MusicRoom-win-x64.zip" -CompressionLevel Optimal
 ```
 
-The published app will be in `bin/Release/net8.0-windows/win-x64/publish/`.
+The published app and license will be in the `publish/` folder; the distributable archive is `MusicRoom-win-x64.zip`.
+
+## GitHub Actions
+
+The **Build Windows package** workflow builds the app and uploads `MusicRoom-win-x64.zip` on pushes to `main`, pull requests, or manual runs. To create a GitHub Release with the packaged app attached, push a version tag such as `v1.0.0`.
 
 ## Music and playlists
 
