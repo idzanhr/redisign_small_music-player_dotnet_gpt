@@ -27,6 +27,15 @@ The published app and license will be in the `publish/` folder; the distributabl
 
 The **Build Windows package** workflow builds the app and uploads `MusicRoom-win-x64.zip` on pushes to `main`, pull requests, or manual runs. To create a GitHub Release with the packaged app attached, push a version tag such as `v1.0.2`.
 
+### Signed releases
+
+Release tags are signed with an Authenticode code-signing certificate. Before creating a release tag, add these repository **Actions secrets** under **Settings → Secrets and variables → Actions**:
+
+- `WINDOWS_SIGNING_CERTIFICATE_BASE64` — the password-protected PFX certificate, encoded as Base64.
+- `WINDOWS_SIGNING_CERTIFICATE_PASSWORD` — the PFX password.
+
+The release workflow signs and verifies `MusicRoom.exe` before packaging it. It fails rather than publishing an unsigned release if either secret is missing. Never commit the certificate or its password. The signing certificate must be issued for code signing by a trusted certificate authority; a regular HTTPS/TLS certificate will not work.
+
 ## Music and playlists
 
 Add a folder to import its supported tracks and create or update a playlist named after the folder. Add individual songs to the library or to the currently open playlist. Select songs and use **Add to playlist** to build mixes from different artists. Create, rename and delete playlists from the sidebar and playlist header.
