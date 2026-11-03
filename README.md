@@ -4,6 +4,8 @@ A small dark themed Windows desktop music player. It uses WPF and Windows' built
 
 Copyright (C) 2026 Marko Idžan. This project is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3 or (at your option) any later version. It is provided without any warranty. See [LICENSE](LICENSE). The DJ icon is by [Icons8](https://icons8.com) and is credited in the app's About section.
 
+See [Contributors](CONTRIBUTORS.md).
+
 ## Run on Windows 11
 
 Install the .NET 8 SDK, open this folder in a terminal, and run:
