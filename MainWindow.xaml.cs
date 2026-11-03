@@ -80,13 +80,13 @@ public partial class MainWindow : Window
             foreach (var playlist in data.Playlists) { playlist.Paths = playlist.Paths.Where(File.Exists).Distinct(StringComparer.OrdinalIgnoreCase).ToList(); _playlists.Add(playlist); }
             PlaylistList.ItemsSource = _playlists;
         }
-        catch (Exception ex) { MessageBox.Show(this, $"Your saved music library couldn't be loaded.\n\n{ex.Message}", "Music Room", MessageBoxButton.OK, MessageBoxImage.Information); }
+        catch (Exception ex) { MessageBox.Show(this, $"Your saved music library couldn't be loaded.\n\n{ex.Message}", "Micro Music Room", MessageBoxButton.OK, MessageBoxImage.Information); }
     }
 
     private void SaveLibrary()
     {
         try { Directory.CreateDirectory(DataDirectory); File.WriteAllText(DataFile, JsonSerializer.Serialize(new LibraryData { Tracks = _tracks.Select(t => t.Path).Distinct(StringComparer.OrdinalIgnoreCase).ToList(), Playlists = _playlists.ToList() }, new JsonSerializerOptions { WriteIndented = true })); }
-        catch (Exception ex) { MessageBox.Show(this, $"Couldn't save your playlists.\n\n{ex.Message}", "Music Room", MessageBoxButton.OK, MessageBoxImage.Warning); }
+        catch (Exception ex) { MessageBox.Show(this, $"Couldn't save your playlists.\n\n{ex.Message}", "Micro Music Room", MessageBoxButton.OK, MessageBoxImage.Warning); }
     }
 
     private static Track MakeTrack(string path)
@@ -102,7 +102,7 @@ public partial class MainWindow : Window
     {
         List<string> files;
         try { files = Directory.EnumerateFiles(folder, "*", SearchOption.AllDirectories).Where(p => Formats.Contains(System.IO.Path.GetExtension(p), StringComparer.OrdinalIgnoreCase)).ToList(); }
-        catch (Exception ex) { MessageBox.Show(this, $"Couldn't read that folder.\n\n{ex.Message}", "Music Room", MessageBoxButton.OK, MessageBoxImage.Information); return; }
+        catch (Exception ex) { MessageBox.Show(this, $"Couldn't read that folder.\n\n{ex.Message}", "Micro Music Room", MessageBoxButton.OK, MessageBoxImage.Information); return; }
         if (files.Count == 0) { MessageBox.Show(this, "No supported audio files were found in that folder.", "No music found", MessageBoxButton.OK, MessageBoxImage.Information); return; }
         AddToLibrary(files);
         var name = new DirectoryInfo(folder).Name;
@@ -137,7 +137,7 @@ public partial class MainWindow : Window
     {
         var name = Prompt("Create a playlist", "Playlist name", "My mix");
         if (string.IsNullOrWhiteSpace(name)) return;
-        if (_playlists.Any(p => p.Name.Equals(name.Trim(), StringComparison.OrdinalIgnoreCase))) { MessageBox.Show(this, "A playlist with that name already exists.", "Music Room"); return; }
+        if (_playlists.Any(p => p.Name.Equals(name.Trim(), StringComparison.OrdinalIgnoreCase))) { MessageBox.Show(this, "A playlist with that name already exists.", "Micro Music Room"); return; }
         var playlist = new Playlist { Name = name.Trim() }; _playlists.Add(playlist); PlaylistList.ItemsSource = null; PlaylistList.ItemsSource = _playlists; SaveLibrary(); PlaylistList.SelectedItem = playlist;
     }
 
@@ -152,7 +152,7 @@ public partial class MainWindow : Window
         var p = _playlists.FirstOrDefault(p => p.Name == _activePlaylistName); if (p is null) return;
         var name = Prompt("Rename playlist", "Playlist name", p.Name);
         if (string.IsNullOrWhiteSpace(name)) return;
-        if (_playlists.Any(x => x != p && x.Name.Equals(name, StringComparison.OrdinalIgnoreCase))) { MessageBox.Show(this, "A playlist with that name already exists.", "Music Room"); return; }
+        if (_playlists.Any(x => x != p && x.Name.Equals(name, StringComparison.OrdinalIgnoreCase))) { MessageBox.Show(this, "A playlist with that name already exists.", "Micro Music Room"); return; }
         p.Name = name; var selected = p; PlaylistList.ItemsSource = null; PlaylistList.ItemsSource = _playlists; PlaylistList.SelectedItem = selected; _activePlaylistName = p.Name; SaveLibrary(); RefreshDisplay();
     }
 
@@ -193,7 +193,7 @@ public partial class MainWindow : Window
         if (_currentIndex < 0 || _currentIndex >= _queue.Count) return;
         var t = _queue[_currentIndex];
         try { _media.Stop(); _media.Source = new Uri(t.Path); _media.Position = TimeSpan.Zero; NowTitle.Text = t.Title; NowArtist.Text = t.Artist; ElapsedLabel.Text = "0:00"; DurationLabel.Text = t.DurationLabel; ProgressSlider.Value = 0; _media.Play(); PlayIcon(true); }
-        catch (Exception ex) { MessageBox.Show(this, $"Couldn't open this track.\n\n{ex.Message}", "Music Room", MessageBoxButton.OK, MessageBoxImage.Information); }
+        catch (Exception ex) { MessageBox.Show(this, $"Couldn't open this track.\n\n{ex.Message}", "Micro Music Room", MessageBoxButton.OK, MessageBoxImage.Information); }
     }
 
     private void NextTrack()
@@ -240,8 +240,8 @@ public partial class MainWindow : Window
 
     private void AboutLicense_Click(object sender, RoutedEventArgs e)
     {
-        const string notice = "Music Room\nCopyright (C) 2026 Marko Idžan\n\nThis program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it under the terms of the GNU General Public License, version 3 or (at your option) any later version.\n\nSelect ‘View GNU GPL’ to read the complete license.";
-        var dialog = new Window { Title = "About Music Room", Width = 510, Height = 280, WindowStartupLocation = WindowStartupLocation.CenterOwner, ResizeMode = ResizeMode.NoResize, Background = new SolidColorBrush(Color.FromRgb(28, 28, 34)), Foreground = Brushes.White, FontFamily = new FontFamily("Segoe UI"), Owner = this };
+        const string notice = "Micro Music Room\nCopyright (C) 2026 Marko Idžan\n\nThis program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it under the terms of the GNU General Public License, version 3 or (at your option) any later version.\n\nSelect ‘View GNU GPL’ to read the complete license.";
+        var dialog = new Window { Title = "About Micro Music Room", Width = 510, Height = 280, WindowStartupLocation = WindowStartupLocation.CenterOwner, ResizeMode = ResizeMode.NoResize, Background = new SolidColorBrush(Color.FromRgb(28, 28, 34)), Foreground = Brushes.White, FontFamily = new FontFamily("Segoe UI"), Owner = this };
         var panel = new StackPanel { Margin = new Thickness(22) };
         panel.Children.Add(new TextBlock { Text = notice, TextWrapping = TextWrapping.Wrap, LineHeight = 23 });
         var iconCredit = new TextBlock { Margin = new Thickness(0, 10, 0, 0) };

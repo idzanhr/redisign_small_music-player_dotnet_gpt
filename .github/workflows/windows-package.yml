@@ -38,38 +38,54 @@ jobs:
           SIGNING_CERTIFICATE_BASE64: ${{ secrets.WINDOWS_SIGNING_CERTIFICATE_BASE64 }}
           SIGNING_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_SIGNING_CERTIFICATE_PASSWORD }}
         run: |
-          if ([string]::IsNullOrWhiteSpace($env:SIGNING_CERTIFICATE_BASE64) -or [string]::IsNullOrWhiteSpace($env:SIGNING_CERTIFICATE_PASSWORD)) {
-            throw "Add the WINDOWS_SIGNING_CERTIFICATE_BASE64 and WINDOWS_SIGNING_CERTIFICATE_PASSWORD repository secrets before creating a signed release."
+          if ([string]::IsNullOrWhiteSpace($env:SIGNING_CERTIFICATE_BASE64) -and [string]::IsNullOrWhiteSpace($env:SIGNING_CERTIFICATE_PASSWORD)) {
+            Write-Host "::notice::No code-signing certificate configured. The GitHub ZIP will be unsigned; Microsoft signs the Store MSIX after certification."
+          }
+          elseif ([string]::IsNullOrWhiteSpace($env:SIGNING_CERTIFICATE_BASE64) -or [string]::IsNullOrWhiteSpace($env:SIGNING_CERTIFICATE_PASSWORD)) {
+            throw "Set both WINDOWS_SIGNING_CERTIFICATE_BASE64 and WINDOWS_SIGNING_CERTIFICATE_PASSWORD, or remove both secrets."
+          }
+          else {
+            $certificatePath = Join-Path $env:RUNNER_TEMP "micromusicroom-signing.pfx"
+            try {
+              [IO.File]::WriteAllBytes($certificatePath, [Convert]::FromBase64String($env:SIGNING_CERTIFICATE_BASE64))
+              $sdkBin = Join-Path ([Environment]::GetFolderPath("ProgramFilesX86")) "Windows Kits\10\bin"
+              $signTool = Get-ChildItem -Path $sdkBin -Filter signtool.exe -Recurse -ErrorAction Stop |
+                Where-Object { $_.FullName -match "\\x64\\signtool\.exe$" } |
+                Sort-Object -Property FullName -Descending |
+                Select-Object -First 1
+              if (-not $signTool) { throw "SignTool was not found in the Windows SDK." }
+
+              & $signTool.FullName sign /fd SHA256 /td SHA256 /tr "http://timestamp.digicert.com" /f $certificatePath /p $env:SIGNING_CERTIFICATE_PASSWORD "publish\MicroMusicRoom.exe"
+              if ($LASTEXITCODE -ne 0) { throw "SignTool failed to sign MicroMusicRoom.exe." }
+              & $signTool.FullName verify /pa /v "publish\MicroMusicRoom.exe"
+              if ($LASTEXITCODE -ne 0) { throw "SignTool could not verify the MicroMusicRoom.exe signature." }
+            }
+            finally {
+              Remove-Item -LiteralPath $certificatePath -Force -ErrorAction SilentlyContinue
+            }
           }
 
-          $certificatePath = Join-Path $env:RUNNER_TEMP "musicroom-signing.pfx"
-          try {
-            [IO.File]::WriteAllBytes($certificatePath, [Convert]::FromBase64String($env:SIGNING_CERTIFICATE_BASE64))
-            $sdkBin = Join-Path ([Environment]::GetFolderPath("ProgramFilesX86")) "Windows Kits\10\bin"
-            $signTool = Get-ChildItem -Path $sdkBin -Filter signtool.exe -Recurse -ErrorAction Stop |
-              Where-Object { $_.FullName -match "\\x64\\signtool\.exe$" } |
-              Sort-Object -Property FullName -Descending |
-              Select-Object -First 1
-            if (-not $signTool) { throw "SignTool was not found in the Windows SDK." }
-
-            & $signTool.FullName sign /fd SHA256 /td SHA256 /tr "http://timestamp.digicert.com" /f $certificatePath /p $env:SIGNING_CERTIFICATE_PASSWORD "publish\MusicRoom.exe"
-            if ($LASTEXITCODE -ne 0) { throw "SignTool failed to sign MusicRoom.exe." }
-            & $signTool.FullName verify /pa /v "publish\MusicRoom.exe"
-            if ($LASTEXITCODE -ne 0) { throw "SignTool could not verify the MusicRoom.exe signature." }
-          }
-          finally {
-            Remove-Item -LiteralPath $certificatePath -Force -ErrorAction SilentlyContinue
-          }
+      - name: Build Microsoft Store MSIX
+        shell: pwsh
+        run: ./scripts/package-msix.ps1 -PublishDirectory "publish" -OutputPackage "store-package/MicroMusicRoom.msix"
 
       - name: Create ZIP package
         shell: pwsh
-        run: Compress-Archive -Path "publish\*" -DestinationPath "MusicRoom-win-x64.zip" -CompressionLevel Optimal
+        run: Compress-Archive -Path "publish\*" -DestinationPath "MicroMusicRoom-win-x64.zip" -CompressionLevel Optimal
 
-      - name: Upload package to workflow run
+      - name: Upload GitHub ZIP package
         uses: actions/upload-artifact@v4
         with:
-          name: MusicRoom-win-x64
-          path: MusicRoom-win-x64.zip
+          name: MicroMusicRoom-win-x64
+          path: MicroMusicRoom-win-x64.zip
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload Microsoft Store MSIX package
+        uses: actions/upload-artifact@v4
+        with:
+          name: MicroMusicRoom-MSIX-Store
+          path: store-package/MicroMusicRoom.msix
           if-no-files-found: error
           retention-days: 30
 
@@ -78,5 +94,5 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
-          files: MusicRoom-win-x64.zip
+          files: MicroMusicRoom-win-x64.zip
 
