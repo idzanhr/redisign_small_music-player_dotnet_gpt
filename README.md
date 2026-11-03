@@ -25,7 +25,7 @@ The published app and license will be in the `publish/` folder; the distributabl
 
 ## GitHub Actions
 
-The **Build Windows package** workflow builds the app and uploads `MusicRoom-win-x64.zip` on pushes to `main`, pull requests, or manual runs. To create a GitHub Release with the packaged app attached, push a version tag such as `v1.0.1`.
+The **Build Windows package** workflow builds the app and uploads `MusicRoom-win-x64.zip` on pushes to `main`, pull requests, or manual runs. To create a GitHub Release with the packaged app attached, push a version tag such as `v1.0.2`.
 
 ## Music and playlists
 
