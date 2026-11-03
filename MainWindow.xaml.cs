@@ -244,6 +244,10 @@ public partial class MainWindow : Window
         var dialog = new Window { Title = "About Music Room", Width = 510, Height = 280, WindowStartupLocation = WindowStartupLocation.CenterOwner, ResizeMode = ResizeMode.NoResize, Background = new SolidColorBrush(Color.FromRgb(28, 28, 34)), Foreground = Brushes.White, FontFamily = new FontFamily("Segoe UI"), Owner = this };
         var panel = new StackPanel { Margin = new Thickness(22) };
         panel.Children.Add(new TextBlock { Text = notice, TextWrapping = TextWrapping.Wrap, LineHeight = 23 });
+        var iconCredit = new TextBlock { Margin = new Thickness(0, 10, 0, 0) };
+        var iconLink = new System.Windows.Documents.Hyperlink(new System.Windows.Documents.Run("DJ icon by Icons8")) { NavigateUri = new Uri("https://icons8.com") };
+        iconLink.RequestNavigate += (_, e) => System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(e.Uri.AbsoluteUri) { UseShellExecute = true });
+        iconCredit.Inlines.Add(iconLink); panel.Children.Add(iconCredit);
         var viewLicense = new Button { Content = "View GNU GPL", MinWidth = 120, HorizontalAlignment = HorizontalAlignment.Right, Margin = new Thickness(0, 18, 0, 0) };
         panel.Children.Add(viewLicense); dialog.Content = panel;
         viewLicense.Click += (_, _) =>

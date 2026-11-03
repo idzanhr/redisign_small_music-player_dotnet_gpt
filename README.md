@@ -2,7 +2,7 @@
 
 A small dark themed Windows desktop music player. It uses WPF and Windows' built-in media playback, with no third-party package dependencies.
 
-Copyright (C) 2026 Marko Idžan. This project is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3 or (at your option) any later version. It is provided without any warranty. See [LICENSE](LICENSE).
+Copyright (C) 2026 Marko Idžan. This project is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3 or (at your option) any later version. It is provided without any warranty. See [LICENSE](LICENSE). The DJ icon is by [Icons8](https://icons8.com) and is credited in the app's About section.
 
 ## Run on Windows 11
 
@@ -23,7 +23,7 @@ The published app and license will be in the `publish/` folder; the distributabl
 
 ## GitHub Actions
 
-The **Build Windows package** workflow builds the app and uploads `MusicRoom-win-x64.zip` on pushes to `main`, pull requests, or manual runs. To create a GitHub Release with the packaged app attached, push a version tag such as `v1.0.0`.
+The **Build Windows package** workflow builds the app and uploads `MusicRoom-win-x64.zip` on pushes to `main`, pull requests, or manual runs. To create a GitHub Release with the packaged app attached, push a version tag such as `v1.0.1`.
 
 ## Music and playlists
 
